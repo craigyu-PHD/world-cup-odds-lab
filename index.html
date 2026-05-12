@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>世足推演台 | 運動彩模擬分析系統</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-theme="light">
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="app-shell">
+    <header class="stadium-hero">
+      <div class="hero-media" aria-hidden="true">
+        <div class="montage montage-a"></div>
+        <div class="montage montage-b"></div>
+        <div class="pitch-lines"></div>
+      </div>
+      <nav class="topbar" aria-label="主導覽">
+        <div class="brand-lockup">
+          <span class="brand-mark">W26</span>
+          <div>
+            <p class="eyebrow">World Cup Odds Lab</p>
+            <h1>世足推演台</h1>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <div class="status-pill">
+            <span class="pulse"></span>
+            <span id="refreshLabel">資料初始化</span>
+          </div>
+          <button class="ghost-button" id="refreshButton" type="button">更新</button>
+          <button class="ghost-button" id="themeToggle" type="button" aria-pressed="false">暗黑模式</button>
+        </div>
+      </nav>
+
+      <div class="hero-content">
+        <div class="hero-copy">
+          <p class="eyebrow">推演 · 賠率 · 模擬投注</p>
+          <h2>把世界盃賽事變成一座可操作的足球情報室。</h2>
+          <p>先看資料源是否在線，再用組別、勝率和盤口差距找出值得複查的場次；想測的選項一鍵加入模擬單。</p>
+        </div>
+        <div class="hero-guide" aria-label="快速操作">
+          <article>
+            <span>01</span>
+            <strong>選比賽</strong>
+            <small>搜尋球隊或切組別。</small>
+          </article>
+          <article>
+            <span>02</span>
+            <strong>看差距</strong>
+            <small>比對模型與盤口。</small>
+          </article>
+          <article>
+            <span>03</span>
+            <strong>放入模擬單</strong>
+            <small>測單場或串關。</small>
+          </article>
+        </div>
+      </div>
+    </header>
+
+    <nav class="workspace-tabs" aria-label="工作區分頁">
+      <button class="active" data-view-tab="sim" type="button">推演台</button>
+      <button data-view-tab="data" type="button">資料雷達</button>
+      <button data-view-tab="watch" type="button">賽事收看</button>
+      <button data-view-tab="guide" type="button">使用指南</button>
+    </nav>
+
+    <section class="app-view active" data-view-panel="sim">
+      <main class="dashboard-grid" id="simulator" tabindex="-1">
+        <section class="panel source-panel" aria-labelledby="sourceTitle">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">資料串接</p>
+              <h2 id="sourceTitle">來源狀態</h2>
+            </div>
+            <span class="mini-badge">Live-ready</span>
+          </div>
+          <div class="source-list" id="sourceList"></div>
+          <div class="connector-box">
+            <label for="proxyEndpoint">賠率 Proxy 端點</label>
+            <div class="endpoint-row">
+              <input id="proxyEndpoint" type="url" placeholder="https://your-domain/api/worldcup-odds">
+              <button id="connectEndpoint" type="button">連線</button>
+            </div>
+            <p>正式版由後端保存 API key；前端只接收標準化後的 JSON。</p>
+          </div>
+        </section>
+
+        <section class="panel overview-panel" aria-labelledby="overviewTitle">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">勝率引擎</p>
+              <h2 id="overviewTitle">推演摘要</h2>
+            </div>
+            <select id="sortSelect" aria-label="排序方式">
+              <option value="edge">模型差距</option>
+              <option value="time">賽程順序</option>
+              <option value="confidence">信心水位</option>
+            </select>
+          </div>
+          <div class="metric-strip" id="metricStrip"></div>
+          <div class="control-deck">
+            <label>
+              <span>搜尋</span>
+              <input id="searchInput" type="search" placeholder="輸入球隊、組別、場次">
+            </label>
+            <label>
+              <span>組別</span>
+              <select id="groupFilter"></select>
+            </label>
+            <label>
+              <span>玩法</span>
+              <select id="marketFilter">
+                <option value="h2h">不讓分</option>
+                <option value="spread">讓分</option>
+                <option value="total">大小</option>
+              </select>
+            </label>
+          </div>
+          <div class="insight-rail" id="insightRail"></div>
+        </section>
+
+        <section class="match-board" aria-label="賽事列表">
+          <div class="board-header">
+            <span>賽程與賠率</span>
+            <span id="matchCount">0 場</span>
+          </div>
+          <div class="match-list" id="matchList"></div>
+        </section>
+
+        <aside class="right-rail">
+          <section class="panel detail-panel" aria-labelledby="detailTitle">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">單場分析</p>
+                <h2 id="detailTitle">場次詳情</h2>
+              </div>
+            </div>
+            <div id="matchDetail"></div>
+          </section>
+
+          <section class="panel betslip-panel" aria-labelledby="betslipTitle">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">台灣運彩格式</p>
+                <h2 id="betslipTitle">模擬投注單</h2>
+              </div>
+              <button class="ghost-button compact" id="clearSlip" type="button">清空</button>
+            </div>
+            <div class="stake-row">
+              <label for="stakeInput">每注金額</label>
+              <input id="stakeInput" type="number" min="10" step="10" value="100">
+            </div>
+            <div class="mode-toggle" role="group" aria-label="投注模式">
+              <button class="active" data-slip-mode="single" type="button">單場</button>
+              <button data-slip-mode="parlay" type="button">串關</button>
+            </div>
+            <div id="betslipList" class="betslip-list"></div>
+            <div class="payout-box">
+              <span>預估最高返還</span>
+              <strong id="payoutEstimate">$0</strong>
+            </div>
+            <button class="primary-button" id="submitSim" type="button">建立模擬單</button>
+            <div id="ticketHistory" class="ticket-history"></div>
+          </section>
+        </aside>
+      </main>
+    </section>
+
+    <section class="app-view" data-view-panel="data" aria-label="資料雷達">
+      <div class="data-layout">
+        <section class="panel data-brief">
+          <p class="eyebrow">Realtime data stack</p>
+          <h2>資料更新架構</h2>
+          <p>賠率、比分、賽程、影像來源分開串接，前端只拿清洗後資料。正式部署時把 API key 放在 GitHub Secrets、Vercel 或 Netlify 環境變數。</p>
+          <div class="cadence-grid">
+            <article><strong>15 秒</strong><span>live odds / live score during match</span></article>
+            <article><strong>30-60 秒</strong><span>賽前主要盤口更新</span></article>
+            <article><strong>6 小時</strong><span>傷停、陣容、新聞摘要</span></article>
+            <article><strong>每日</strong><span>賽程、場館、歷史資料校正</span></article>
+          </div>
+        </section>
+        <section class="panel source-stack-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">串接來源</p>
+              <h2>後端候選資料源</h2>
+            </div>
+          </div>
+          <div class="integration-grid" id="integrationGrid"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="app-view" data-view-panel="watch" aria-label="賽事收看">
+      <div class="watch-layout">
+        <section class="panel video-stage">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Official video hub</p>
+              <h2>官方影像與收看入口</h2>
+            </div>
+            <a class="link-button" href="https://www.youtube.com/@fifa" target="_blank" rel="noreferrer">FIFA YouTube</a>
+          </div>
+          <div class="video-frame">
+            <iframe
+              id="officialVideo"
+              title="FIFA 官方 YouTube 最新影片"
+              data-src="https://www.youtube.com/embed?listType=user_uploads&list=FIFATV"
+              srcdoc="<style>body{margin:0;display:grid;place-items:center;min-height:100vh;background:#07110c;color:#f4ffe9;font-family:sans-serif}strong{font-size:22px}span{display:block;margin-top:8px;color:#b7c9bd}</style><div><strong>切到賽事收看時載入官方影片</strong><span>Official FIFA video hub</span></div>"
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen></iframe>
+          </div>
+          <p class="watch-note">世界盃開賽前，此區會顯示 FIFA 官方 YouTube 最新影片與檔案內容。開賽後可改接官方媒體夥伴直播、FIFA+ 或你所在地可合法收看的平台。</p>
+        </section>
+        <section class="panel watch-list-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Match links</p>
+              <h2>每場賽事收看連結</h2>
+            </div>
+          </div>
+          <div class="watch-list" id="watchList"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="app-view" data-view-panel="guide" aria-label="使用指南">
+      <div class="guide-board">
+        <article class="guide-card">
+          <span>第一步</span>
+          <h2>先確認資料源</h2>
+          <p>左側會告訴你目前是示範資料、真實 API，還是等待 API key。正式使用時先連後端 proxy。</p>
+        </article>
+        <article class="guide-card">
+          <span>第二步</span>
+          <h2>用篩選縮小範圍</h2>
+          <p>選組別、玩法或直接搜尋球隊。排序選「模型差距」時，最值得複查的場次會排在前面。</p>
+        </article>
+        <article class="guide-card">
+          <span>第三步</span>
+          <h2>讀懂卡片</h2>
+          <p>綠色代表主隊，金色代表和局，藍色代表客隊。差距為正代表模型比盤口更看好。</p>
+        </article>
+        <article class="guide-card">
+          <span>第四步</span>
+          <h2>只做模擬</h2>
+          <p>點盤口加入投注單，切換單場或串關看預估返還。網站不會送出任何真實投注交易。</p>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
