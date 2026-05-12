@@ -231,6 +231,7 @@ let selectedMatchId = matches[0].id;
 let slipMode = "single";
 let betslip = [];
 let tickets = [];
+let lastFocusedMatchCard = null;
 
 const elements = {};
 
@@ -268,7 +269,14 @@ function collectElements() {
     "themeToggle",
     "integrationGrid",
     "watchList",
-    "officialVideo"
+    "officialVideo",
+    "homeGoalInput",
+    "awayGoalInput",
+    "marketShockInput",
+    "sandboxResult",
+    "rulesModal",
+    "rulesContent",
+    "rulesClose"
   ].forEach((id) => {
     elements[id] = document.getElementById(id);
   });
@@ -307,6 +315,18 @@ function bindEvents() {
     renderBetslip();
   });
   elements.stakeInput.addEventListener("input", renderBetslip);
+  elements.homeGoalInput.addEventListener("input", renderSandbox);
+  elements.awayGoalInput.addEventListener("input", renderSandbox);
+  elements.marketShockInput.addEventListener("input", renderSandbox);
+  elements.rulesClose.addEventListener("click", closeRulesModal);
+  elements.rulesModal.addEventListener("click", (event) => {
+    if (event.target === elements.rulesModal) closeRulesModal();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && elements.rulesModal.getAttribute("aria-hidden") === "false") {
+      closeRulesModal();
+    }
+  });
   document.querySelectorAll("[data-slip-mode]").forEach((button) => {
     button.addEventListener("click", () => {
       slipMode = button.dataset.slipMode;
@@ -473,6 +493,7 @@ function render() {
   renderInsights();
   renderMatchList();
   renderDetail();
+  renderSandbox();
   renderBetslip();
 }
 
@@ -529,10 +550,10 @@ function renderMetrics() {
   }, { value: 0, label: "無" });
   const favorites = selected.filter((match) => Math.max(...Object.values(blendedProbabilities(match))) > 0.55).length;
   elements.metricStrip.innerHTML = [
-    metricTemplate("涵蓋場次", selected.length, "小組賽"),
-    metricTemplate("平均信心", `${Math.round(avgConfidence)}%`, "模型穩定度"),
-    metricTemplate("熱門明顯", favorites, "勝率 > 55%"),
-    metricTemplate("最大差距", pct(Math.abs(topEdge.value)), topEdge.label)
+    metricTemplate("場次", selected.length, "目前篩選"),
+    metricTemplate("信心", `${Math.round(avgConfidence)}%`, "模型平均"),
+    metricTemplate("熱門", favorites, "勝率 > 55%"),
+    metricTemplate("差距", pct(Math.abs(topEdge.value)), topEdge.label)
   ].join("");
 }
 
@@ -572,12 +593,35 @@ function renderMatchList() {
     card.addEventListener("click", (event) => {
       if (event.target.closest("button")) return;
       selectedMatchId = card.dataset.matchId;
+      lastFocusedMatchCard = card;
       renderMatchList();
       renderDetail();
+      renderSandbox();
+      openRulesModal(selectedMatchId);
+    });
+    card.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        selectedMatchId = card.dataset.matchId;
+        lastFocusedMatchCard = card;
+        renderMatchList();
+        renderDetail();
+        renderSandbox();
+        openRulesModal(selectedMatchId);
+      }
     });
   });
   elements.matchList.querySelectorAll("[data-pick]").forEach((button) => {
     button.addEventListener("click", () => addPick(JSON.parse(button.dataset.pick)));
+  });
+  elements.matchList.querySelectorAll("[data-rule-match]").forEach((button) => {
+    button.addEventListener("click", () => {
+      selectedMatchId = button.dataset.ruleMatch;
+      renderMatchList();
+      renderDetail();
+      renderSandbox();
+      openRulesModal(selectedMatchId);
+    });
   });
 }
 
@@ -588,13 +632,14 @@ function matchCard(match, market) {
   const away = teamProfiles[match.away];
   const isSelected = match.id === selectedMatchId ? " selected" : "";
   return `
-    <article class="match-card${isSelected}" data-match-id="${match.id}">
+    <article class="match-card${isSelected}" data-match-id="${match.id}" tabindex="0" aria-label="${shortName(match.home)} 對 ${shortName(match.away)} 賽事規格">
       <div class="match-meta">
         <span class="match-id">#${match.number} · Group ${match.group} · ${match.date} ${match.time}</span>
         <div class="teams">
           ${teamLine(home, match.home)}
           ${teamLine(away, match.away)}
         </div>
+        <button class="rule-chip" type="button" data-rule-match="${match.id}">規格卡</button>
       </div>
       <div class="prob-bars">
         ${probRow(shortName(match.home), probs.home, "home")}
@@ -709,6 +754,102 @@ function renderDetail() {
   `;
 }
 
+function renderSandbox() {
+  if (!elements.sandboxResult) return;
+  const match = matches.find((item) => item.id === selectedMatchId);
+  if (!match) return;
+  const homeGoals = clamp(Number(elements.homeGoalInput.value) || 0, 0, 8);
+  const awayGoals = clamp(Number(elements.awayGoalInput.value) || 0, 0, 8);
+  const shock = Number(elements.marketShockInput.value) || 0;
+  const probs = blendedProbabilities(match);
+  const goalSwing = clamp((homeGoals - awayGoals) * 0.08 + shock / 300, -0.24, 0.24);
+  const simulated = normalize({
+    home: clamp(probs.home + goalSwing, 0.05, 0.88),
+    draw: clamp(probs.draw - Math.abs(goalSwing) * 0.45, 0.08, 0.34),
+    away: clamp(probs.away - goalSwing, 0.05, 0.88)
+  });
+  const best = Object.entries(simulated).sort((a, b) => b[1] - a[1])[0];
+  const labelMap = {
+    home: shortName(match.home),
+    draw: "和局",
+    away: shortName(match.away)
+  };
+  const selectedValue = betslip.length ? estimatePayout() : 0;
+  elements.sandboxResult.innerHTML = `
+    <div class="sandbox-scoreline">
+      <strong>${shortName(match.home)} ${homeGoals} : ${awayGoals} ${shortName(match.away)}</strong>
+      <span>市場波動 ${shock > 0 ? "+" : ""}${shock}%</span>
+    </div>
+    <div class="sandbox-bars">
+      ${sandboxBar(shortName(match.home), simulated.home, "home")}
+      ${sandboxBar("和局", simulated.draw, "draw")}
+      ${sandboxBar(shortName(match.away), simulated.away, "away")}
+    </div>
+    <div class="sandbox-callout">
+      <span>目前情境傾向</span>
+      <strong>${labelMap[best[0]]} · ${pct(best[1])}</strong>
+      <small>${betslip.length ? `投注單預估返還 ${currency(selectedValue)}` : "尚未加入投注單，可先點盤口測試。"}</small>
+    </div>
+  `;
+}
+
+function sandboxBar(label, probability, type) {
+  return `
+    <div class="sandbox-bar">
+      <span>${label}</span>
+      <div class="track"><div class="fill ${type}" style="width:${Math.round(probability * 100)}%"></div></div>
+      <strong>${pct(probability)}</strong>
+    </div>
+  `;
+}
+
+function openRulesModal(matchId) {
+  const match = matches.find((item) => item.id === matchId);
+  if (!match) return;
+  const h2h = averageH2h(match);
+  const spread = averageSpread(match);
+  const total = averageTotal(match);
+  const probs = blendedProbabilities(match);
+  elements.rulesContent.innerHTML = `
+    <p class="eyebrow">臺彩規格卡 · #${match.number}</p>
+    <h2 id="rulesTitle">${shortName(match.home)} vs ${shortName(match.away)}</h2>
+    <div class="rules-grid">
+      <article>
+        <span>玩法</span>
+        <strong>勝平負</strong>
+        <small>${shortName(match.home)} ${h2h.home.toFixed(2)} · 和 ${h2h.draw.toFixed(2)} · ${shortName(match.away)} ${h2h.away.toFixed(2)}</small>
+      </article>
+      <article>
+        <span>讓分</span>
+        <strong>${formatPoint(spread.point)}</strong>
+        <small>主 ${spread.home.toFixed(2)} · 客 ${spread.away.toFixed(2)}</small>
+      </article>
+      <article>
+        <span>大小</span>
+        <strong>${total.point}</strong>
+        <small>大 ${total.over.toFixed(2)} · 小 ${total.under.toFixed(2)}</small>
+      </article>
+      <article>
+        <span>模型勝率</span>
+        <strong>${pct(probs.home)} / ${pct(probs.draw)} / ${pct(probs.away)}</strong>
+        <small>主勝 / 和局 / 客勝</small>
+      </article>
+    </div>
+    <div class="rules-note">
+      足球全場依 90 分鐘加傷停補時模擬，不含延長賽與 PK。本系統只做沙盤推演與模擬投注單，不送出真實交易。
+    </div>
+  `;
+  elements.rulesModal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-open");
+  elements.rulesClose.focus();
+}
+
+function closeRulesModal() {
+  elements.rulesModal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("modal-open");
+  if (lastFocusedMatchCard) lastFocusedMatchCard.focus();
+}
+
 function analysisItem(label, value) {
   return `<div class="analysis-item"><span>${label}</span><div>${value}</div></div>`;
 }
@@ -725,6 +866,7 @@ function addPick(pick) {
     betslip.push(pick);
   }
   renderBetslip();
+  renderSandbox();
 }
 
 function renderBetslip() {
@@ -744,6 +886,7 @@ function renderBetslip() {
       button.addEventListener("click", () => {
         betslip = betslip.filter((pick) => pick.id !== button.dataset.removePick);
         renderBetslip();
+        renderSandbox();
       });
     });
   }
@@ -763,6 +906,7 @@ function createTicket() {
   });
   betslip = [];
   renderBetslip();
+  renderSandbox();
   renderTickets();
 }
 

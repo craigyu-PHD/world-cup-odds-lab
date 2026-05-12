@@ -119,6 +119,23 @@
               </select>
             </label>
           </div>
+          <div class="taicai-strip" aria-label="臺灣運彩玩法">
+            <article>
+              <span>臺彩模式</span>
+              <strong>足球全場 90 分鐘</strong>
+              <small>不含延長賽與 PK，模擬以固定賠率格式呈現。</small>
+            </article>
+            <article>
+              <span>核心玩法</span>
+              <strong>勝平負 · 讓分 · 大小</strong>
+              <small>與右側模擬投注單同步計算。</small>
+            </article>
+            <article>
+              <span>更新狀態</span>
+              <strong>賠率 / 比分 / 消息</strong>
+              <small>接上 proxy 後可依資料源即時刷新。</small>
+            </article>
+          </div>
           <div class="insight-rail" id="insightRail"></div>
         </section>
 
@@ -138,7 +155,31 @@
                 <h2 id="detailTitle">場次詳情</h2>
               </div>
             </div>
-            <div id="matchDetail"></div>
+          <div id="matchDetail"></div>
+        </section>
+
+          <section class="panel sandbox-panel" aria-labelledby="sandboxTitle">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">沙盤推演</p>
+                <h2 id="sandboxTitle">即時模擬器</h2>
+              </div>
+            </div>
+            <div class="sandbox-controls">
+              <label>
+                <span>主隊進球假設</span>
+                <input id="homeGoalInput" type="number" min="0" max="8" value="1">
+              </label>
+              <label>
+                <span>客隊進球假設</span>
+                <input id="awayGoalInput" type="number" min="0" max="8" value="1">
+              </label>
+              <label>
+                <span>市場波動</span>
+                <input id="marketShockInput" type="range" min="-20" max="20" value="0">
+              </label>
+            </div>
+            <div class="sandbox-result" id="sandboxResult"></div>
           </section>
 
           <section class="panel betslip-panel" aria-labelledby="betslipTitle">
@@ -252,6 +293,13 @@
         </article>
       </div>
     </section>
+  </div>
+
+  <div class="rules-modal" id="rulesModal" aria-hidden="true">
+    <div class="rules-dialog" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
+      <button class="rules-close" id="rulesClose" type="button" aria-label="關閉">×</button>
+      <div id="rulesContent"></div>
+    </div>
   </div>
 
   <script src="assets/app.js"></script>
