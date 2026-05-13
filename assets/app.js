@@ -753,8 +753,14 @@ function renderMatchList() {
   const market = elements.marketFilter.value;
   const sorted = [...getFilteredMatches()].sort((a, b) => sortMatches(a, b));
   elements.matchCount.textContent = `${sorted.length} 場`;
+  elements.marketColumnLabels?.classList.remove("overview-mode");
   if (!sorted.length) {
     elements.matchList.innerHTML = `<div class="empty-state">目前篩選沒有符合的場次。</div>`;
+    return;
+  }
+  if (shouldShowDateOverview()) {
+    elements.marketColumnLabels?.classList.add("overview-mode");
+    renderDateOverview(sorted);
     return;
   }
   const grouped = groupMatchesByDate(sorted);
@@ -804,6 +810,55 @@ function renderMatchList() {
       openRulesModal(selectedMatchId);
     });
   });
+}
+
+function shouldShowDateOverview() {
+  const query = elements.searchInput?.value.trim() || "";
+  const group = elements.groupFilter?.value || "all";
+  return !query && group === "all" && selectedDateFilter === "all" && selectedTimeFilter === "all";
+}
+
+function renderDateOverview(matchList) {
+  const grouped = groupMatchesByDate(matchList);
+  elements.matchList.innerHTML = `
+    <section class="date-overview">
+      <div class="date-overview-head">
+        <div>
+          <span>全部賽事總覽</span>
+          <strong>先選日期，再進入每日盤口</strong>
+        </div>
+        <small>預設不一次展開所有詳細列，避免中欄被擠壓或蓋住。</small>
+      </div>
+      <div class="date-overview-grid">
+        ${grouped.map(([date, dateMatches]) => dateOverviewCard(date, dateMatches)).join("")}
+      </div>
+    </section>
+  `;
+  elements.matchList.querySelectorAll("[data-overview-date]").forEach((button) => {
+    button.addEventListener("click", () => {
+      selectedDateFilter = button.dataset.overviewDate;
+      selectedTimeFilter = "all";
+      renderMetrics();
+      renderInsights();
+      renderDateControls();
+      renderTimeControls();
+      renderMatchList();
+    });
+  });
+}
+
+function dateOverviewCard(date, dateMatches) {
+  const topMatches = [...dateMatches]
+    .sort((a, b) => Math.abs(bestEdge(b).value) - Math.abs(bestEdge(a).value))
+    .slice(0, 2);
+  return `
+    <button class="date-overview-card" type="button" data-overview-date="${date}">
+      <span>${dateLongLabel(date)}</span>
+      <strong>${dateMatches.length} 場賽事</strong>
+      <small>${topMatches.map((match) => `#${match.number} ${shortName(match.home)} vs ${shortName(match.away)}`).join(" / ")}</small>
+      <em>查看這天盤口</em>
+    </button>
+  `;
 }
 
 function matchCard(match, market) {
