@@ -232,12 +232,14 @@ let slipMode = "single";
 let betslip = [];
 let tickets = [];
 let lastFocusedMatchCard = null;
+let selectedDateFilter = "all";
 
 const elements = {};
 
 document.addEventListener("DOMContentLoaded", () => {
   collectElements();
   buildGroupFilter();
+  buildGroupShortcuts();
   bindEvents();
   updateFeed(false);
   render();
@@ -256,6 +258,12 @@ function collectElements() {
     "sortSelect",
     "matchCount",
     "matchList",
+    "catalogMatchTotal",
+    "groupShortcutList",
+    "dateRail",
+    "dateTabs",
+    "marketColumnLabels",
+    "sidebarToggle",
     "matchDetail",
     "clearSlip",
     "stakeInput",
@@ -289,6 +297,16 @@ function buildGroupFilter() {
   ].join("");
 }
 
+function buildGroupShortcuts() {
+  if (!elements.groupShortcutList) return;
+  const allButton = `<button class="active" data-group-shortcut="all" type="button"><strong>全部</strong><span>${matches.length}</span></button>`;
+  const groupButtons = Object.keys(groupTeams).map((group) => {
+    const count = matches.filter((match) => match.group === group).length;
+    return `<button data-group-shortcut="${group}" type="button"><strong>${group}</strong><span>${count}</span></button>`;
+  }).join("");
+  elements.groupShortcutList.innerHTML = allButton + groupButtons;
+}
+
 function bindEvents() {
   elements.refreshButton.addEventListener("click", () => {
     updateFeed(true);
@@ -301,15 +319,50 @@ function bindEvents() {
   elements.searchInput.addEventListener("input", () => {
     renderMetrics();
     renderInsights();
+    renderDateControls();
     renderMatchList();
   });
   elements.groupFilter.addEventListener("change", () => {
+    selectedDateFilter = "all";
+    updateGroupShortcutState();
     renderMetrics();
     renderInsights();
+    renderDateControls();
     renderMatchList();
   });
-  elements.marketFilter.addEventListener("change", renderMatchList);
-  elements.sortSelect.addEventListener("change", renderMatchList);
+  elements.marketFilter.addEventListener("change", () => {
+    updateMarketShortcutState();
+    renderMarketColumnLabels();
+    renderMatchList();
+  });
+  elements.sortSelect.addEventListener("change", () => {
+    renderDateControls();
+    renderMatchList();
+  });
+  if (elements.sidebarToggle) {
+    elements.sidebarToggle.addEventListener("click", toggleSidebar);
+  }
+  if (elements.groupShortcutList) {
+    elements.groupShortcutList.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-group-shortcut]");
+      if (!button) return;
+      elements.groupFilter.value = button.dataset.groupShortcut;
+      selectedDateFilter = "all";
+      updateGroupShortcutState();
+      renderMetrics();
+      renderInsights();
+      renderDateControls();
+      renderMatchList();
+    });
+  }
+  document.querySelectorAll("[data-market-shortcut]").forEach((button) => {
+    button.addEventListener("click", () => {
+      elements.marketFilter.value = button.dataset.marketShortcut;
+      updateMarketShortcutState();
+      renderMarketColumnLabels();
+      renderMatchList();
+    });
+  });
   elements.clearSlip.addEventListener("click", () => {
     betslip = [];
     renderBetslip();
@@ -343,6 +396,14 @@ function toggleTheme() {
   document.body.dataset.theme = isDark ? "light" : "dark";
   elements.themeToggle.textContent = isDark ? "暗黑模式" : "正常模式";
   elements.themeToggle.setAttribute("aria-pressed", String(!isDark));
+}
+
+function toggleSidebar() {
+  const shell = document.getElementById("simulator");
+  const isCollapsed = shell.classList.toggle("sidebar-collapsed");
+  elements.sidebarToggle.textContent = isCollapsed ? "展開" : "收合";
+  elements.sidebarToggle.setAttribute("aria-expanded", String(!isCollapsed));
+  elements.sidebarToggle.setAttribute("aria-label", isCollapsed ? "展開左側目錄" : "收合左側目錄");
 }
 
 function activateView(viewName) {
@@ -491,6 +552,8 @@ function render() {
   renderWatchList();
   renderMetrics();
   renderInsights();
+  renderDateControls();
+  renderMarketColumnLabels();
   renderMatchList();
   renderDetail();
   renderSandbox();
@@ -580,6 +643,64 @@ function metricTemplate(label, value, footnote) {
   return `<div class="metric"><span>${label}</span><strong>${value}</strong><small>${footnote}</small></div>`;
 }
 
+function renderDateControls() {
+  if (!elements.dateTabs || !elements.dateRail) return;
+  const baseMatches = [...getFilteredMatches({ ignoreDate: true })].sort((a, b) => a.number - b.number);
+  const dateEntries = getDateEntries(baseMatches);
+  if (selectedDateFilter !== "all" && !dateEntries.some((entry) => entry.date === selectedDateFilter)) {
+    selectedDateFilter = "all";
+  }
+  const totalCount = baseMatches.length;
+  const tabButtons = [
+    dateTabButton("all", "全部日期", totalCount),
+    ...dateEntries.map((entry) => dateTabButton(entry.date, compactDateLabel(entry.date), entry.count))
+  ].join("");
+  const railButtons = [
+    dateRailButton("all", "全部賽事", totalCount),
+    ...dateEntries.map((entry) => dateRailButton(entry.date, dateLongLabel(entry.date), entry.count))
+  ].join("");
+  elements.dateTabs.innerHTML = tabButtons;
+  elements.dateRail.innerHTML = railButtons;
+  if (elements.catalogMatchTotal) elements.catalogMatchTotal.textContent = matches.length;
+  bindDateFilterButtons();
+}
+
+function dateTabButton(value, label, count) {
+  const active = selectedDateFilter === value ? " active" : "";
+  return `<button class="${active}" data-date-filter="${value}" type="button" role="tab" aria-selected="${selectedDateFilter === value}"><span>${label}</span><small>${count} 場</small></button>`;
+}
+
+function dateRailButton(value, label, count) {
+  const active = selectedDateFilter === value ? " active" : "";
+  return `<button class="${active}" data-date-filter="${value}" type="button"><span>${label}</span><strong>${count}</strong></button>`;
+}
+
+function bindDateFilterButtons() {
+  document.querySelectorAll("[data-date-filter]").forEach((button) => {
+    button.addEventListener("click", () => {
+      selectedDateFilter = button.dataset.dateFilter;
+      renderMetrics();
+      renderInsights();
+      renderDateControls();
+      renderMatchList();
+    });
+  });
+}
+
+function renderMarketColumnLabels() {
+  if (!elements.marketColumnLabels) return;
+  const labels = {
+    h2h: ["主勝", "和局", "客勝"],
+    spread: ["主隊讓分", "客隊受讓", "和局"],
+    total: ["大分", "小分", "和局"]
+  }[elements.marketFilter.value] || ["主勝", "和局", "客勝"];
+  elements.marketColumnLabels.innerHTML = `
+    <span>場次資訊</span>
+    <span>模型勝率</span>
+    <div>${labels.map((label) => `<strong>${label}</strong>`).join("")}</div>
+  `;
+}
+
 function renderMatchList() {
   const market = elements.marketFilter.value;
   const sorted = [...getFilteredMatches()].sort((a, b) => sortMatches(a, b));
@@ -588,7 +709,19 @@ function renderMatchList() {
     elements.matchList.innerHTML = `<div class="empty-state">目前篩選沒有符合的場次。</div>`;
     return;
   }
-  elements.matchList.innerHTML = sorted.map((match) => matchCard(match, market)).join("");
+  const grouped = groupMatchesByDate(sorted);
+  elements.matchList.innerHTML = grouped.map(([date, dateMatches]) => `
+    <section class="coupon-date-section" data-date-section="${date}">
+      <div class="coupon-date-header">
+        <div>
+          <span>${dateLongLabel(date)}</span>
+          <strong>${dateMatches.length} 場賽事</strong>
+        </div>
+        <small>依目前篩選與排序呈現</small>
+      </div>
+      ${dateMatches.map((match) => matchCard(match, market)).join("")}
+    </section>
+  `).join("");
   elements.matchList.querySelectorAll("[data-match-id]").forEach((card) => {
     card.addEventListener("click", (event) => {
       if (event.target.closest("button")) return;
@@ -631,15 +764,24 @@ function matchCard(match, market) {
   const home = teamProfiles[match.home];
   const away = teamProfiles[match.away];
   const isSelected = match.id === selectedMatchId ? " selected" : "";
+  const lead = bestEdge(match);
+  const status = liveStatus(match);
   return `
-    <article class="match-card${isSelected}" data-match-id="${match.id}" tabindex="0" aria-label="${shortName(match.home)} 對 ${shortName(match.away)} 賽事規格">
+    <article class="match-card coupon-row${isSelected}" data-match-id="${match.id}" tabindex="0" aria-label="${shortName(match.home)} 對 ${shortName(match.away)} 賽事規格">
       <div class="match-meta">
-        <span class="match-id">#${match.number} · Group ${match.group} · ${match.date} ${match.time}</span>
+        <div class="coupon-meta-line">
+          <span class="match-id">#${match.number}</span>
+          <span class="status-chip ${status.type}">${status.label}</span>
+          <span>${match.time}</span>
+        </div>
         <div class="teams">
           ${teamLine(home, match.home)}
           ${teamLine(away, match.away)}
         </div>
-        <button class="rule-chip" type="button" data-rule-match="${match.id}">規格卡</button>
+        <div class="match-tools">
+          <span>Group ${match.group} · ${lead.label} ${edgeLabel(lead.value)}</span>
+          <button class="rule-chip" type="button" data-rule-match="${match.id}">規格卡</button>
+        </div>
       </div>
       <div class="prob-bars">
         ${probRow(shortName(match.home), probs.home, "home")}
@@ -933,6 +1075,9 @@ async function connectEndpoint() {
     if (Array.isArray(payload.matches)) {
       matches = payload.matches.map(normalizeExternalMatch);
       selectedMatchId = matches[0]?.id || selectedMatchId;
+      selectedDateFilter = "all";
+      buildGroupShortcuts();
+      updateGroupShortcutState();
       elements.refreshLabel.textContent = "外部資料已載入";
       render();
     } else {
@@ -969,14 +1114,82 @@ function teamCodeFromInput(value) {
   return found ? found[0] : "MEX";
 }
 
-function getFilteredMatches() {
+function getFilteredMatches(options = {}) {
   const query = elements.searchInput?.value.trim().toLowerCase() || "";
   const group = elements.groupFilter?.value || "all";
+  const date = options.ignoreDate ? "all" : selectedDateFilter;
   return matches.filter((match) => {
     const home = teamProfiles[match.home]?.name || match.home;
     const away = teamProfiles[match.away]?.name || match.away;
     const text = `${match.number} ${match.group} ${match.home} ${match.away} ${home} ${away}`.toLowerCase();
-    return (group === "all" || match.group === group) && (!query || text.includes(query));
+    return (group === "all" || match.group === group)
+      && (date === "all" || match.date === date)
+      && (!query || text.includes(query));
+  });
+}
+
+function getDateEntries(matchList) {
+  return groupMatchesByDate(matchList).map(([date, dateMatches]) => ({
+    date,
+    count: dateMatches.length
+  }));
+}
+
+function groupMatchesByDate(matchList) {
+  const groups = new Map();
+  matchList.forEach((match) => {
+    if (!groups.has(match.date)) groups.set(match.date, []);
+    groups.get(match.date).push(match);
+  });
+  return [...groups.entries()].sort((a, b) => dateOrder(a[0]) - dateOrder(b[0]));
+}
+
+function dateOrder(date) {
+  const parsed = parseFixtureDate(date);
+  return parsed ? parsed.getTime() : Number.MAX_SAFE_INTEGER;
+}
+
+function parseFixtureDate(date) {
+  const monthMap = {
+    Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+    Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11
+  };
+  const [month, day] = String(date).split(" ");
+  if (!(month in monthMap) || !Number(day)) return null;
+  return new Date(2026, monthMap[month], Number(day));
+}
+
+function compactDateLabel(date) {
+  const parsed = parseFixtureDate(date);
+  if (!parsed) return date;
+  return `${parsed.getMonth() + 1}/${parsed.getDate()}`;
+}
+
+function dateLongLabel(date) {
+  const parsed = parseFixtureDate(date);
+  if (!parsed) return date;
+  const weekday = new Intl.DateTimeFormat("zh-TW", { weekday: "short" }).format(parsed);
+  return `${compactDateLabel(date)} ${weekday}`;
+}
+
+function liveStatus(match) {
+  if (match.number === 1) return { label: "LIVE", type: "live" };
+  if (match.number % 9 === 0) return { label: "焦點", type: "hot" };
+  if (match.number % 5 === 0) return { label: "快開", type: "soon" };
+  return { label: "賽前", type: "pre" };
+}
+
+function updateGroupShortcutState() {
+  if (!elements.groupShortcutList) return;
+  const selectedGroup = elements.groupFilter.value;
+  elements.groupShortcutList.querySelectorAll("[data-group-shortcut]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.groupShortcut === selectedGroup);
+  });
+}
+
+function updateMarketShortcutState() {
+  document.querySelectorAll("[data-market-shortcut]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.marketShortcut === elements.marketFilter.value);
   });
 }
 

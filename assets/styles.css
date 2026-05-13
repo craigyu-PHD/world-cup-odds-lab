@@ -452,6 +452,380 @@ body[data-theme="dark"] .workspace-tabs button.active {
   display: block;
 }
 
+.sportsbook-shell {
+  display: grid;
+  grid-template-columns: minmax(270px, 310px) minmax(720px, 1fr) minmax(360px, 420px);
+  gap: 14px;
+  align-items: start;
+}
+
+.sportsbook-shell.sidebar-collapsed {
+  grid-template-columns: 74px minmax(760px, 1fr) minmax(360px, 420px);
+}
+
+.catalog-panel,
+.betslip-rail {
+  position: sticky;
+  top: 82px;
+  align-self: start;
+}
+
+.catalog-panel {
+  display: grid;
+  gap: 13px;
+  overflow: hidden;
+}
+
+.catalog-head,
+.section-title,
+.catalog-summary,
+.coupon-topline,
+.coupon-date-header,
+.coupon-meta-line,
+.match-tools {
+  display: flex;
+  align-items: center;
+}
+
+.catalog-head,
+.section-title,
+.coupon-topline,
+.coupon-date-header,
+.match-tools {
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.icon-button {
+  min-width: 48px;
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.sportsbook-shell.sidebar-collapsed .catalog-panel {
+  padding: 10px;
+}
+
+.sportsbook-shell.sidebar-collapsed .catalog-panel > :not(.catalog-head),
+.sportsbook-shell.sidebar-collapsed .catalog-head > div {
+  display: none;
+}
+
+.sportsbook-shell.sidebar-collapsed .catalog-head {
+  justify-content: center;
+}
+
+.sportsbook-shell.sidebar-collapsed .icon-button {
+  width: 50px;
+  min-width: 50px;
+  height: 50px;
+  border-radius: 16px;
+}
+
+.catalog-summary {
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 88% 12%, color-mix(in oklab, var(--lime), transparent 67%), transparent 35%),
+    linear-gradient(135deg, color-mix(in oklab, var(--grass), transparent 82%), transparent 72%),
+    var(--surface-soft);
+}
+
+.catalog-summary span,
+.catalog-summary small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.catalog-summary strong {
+  color: var(--ink-strong);
+  font-size: 36px;
+  line-height: 1;
+}
+
+.catalog-summary small {
+  max-width: 120px;
+  line-height: 1.35;
+}
+
+.catalog-section {
+  display: grid;
+  gap: 9px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.section-title span {
+  color: var(--ink-strong);
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.section-title small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.group-shortcut-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.group-shortcut-list button,
+.market-shortcuts button,
+.date-rail button,
+.date-tabs button {
+  border: 1px solid var(--line);
+  background: var(--surface-solid);
+  color: var(--ink);
+  font-weight: 950;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.group-shortcut-list button:hover,
+.market-shortcuts button:hover,
+.date-rail button:hover,
+.date-tabs button:hover {
+  transform: translateY(-1px);
+}
+
+.group-shortcut-list button {
+  min-height: 54px;
+  padding: 8px 6px;
+  border-radius: 12px;
+}
+
+.group-shortcut-list strong,
+.group-shortcut-list span {
+  display: block;
+}
+
+.group-shortcut-list strong {
+  color: var(--ink-strong);
+  font-size: 14px;
+}
+
+.group-shortcut-list span {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.group-shortcut-list button.active,
+.market-shortcuts button.active,
+.date-rail button.active,
+.date-tabs button.active {
+  border-color: color-mix(in oklab, var(--grass), transparent 25%);
+  background: linear-gradient(135deg, color-mix(in oklab, var(--lime), transparent 62%), color-mix(in oklab, var(--grass), transparent 83%));
+  color: var(--grass-2);
+}
+
+body[data-theme="dark"] .group-shortcut-list button.active,
+body[data-theme="dark"] .market-shortcuts button.active,
+body[data-theme="dark"] .date-rail button.active,
+body[data-theme="dark"] .date-tabs button.active {
+  color: var(--lime);
+}
+
+.market-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.market-shortcuts button {
+  min-height: 40px;
+  border-radius: 12px;
+}
+
+.date-rail {
+  display: grid;
+  gap: 7px;
+}
+
+.date-rail button {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 10px;
+  border-radius: 12px;
+}
+
+.date-rail span {
+  font-size: 12px;
+}
+
+.date-rail strong {
+  color: var(--ink-strong);
+  font-size: 13px;
+}
+
+.compact-heading {
+  margin-bottom: 8px;
+}
+
+.compact-source-list .source-item {
+  padding: 9px 9px 9px 12px;
+}
+
+.compact-source-list .source-item:nth-child(n+5) {
+  display: none;
+}
+
+.compact-source-list .source-link {
+  display: none;
+}
+
+.compact-connector {
+  margin-top: 9px;
+  padding-top: 10px;
+}
+
+.coupon-main {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.sportsbook-shell > .right-rail {
+  grid-row: auto;
+  display: grid;
+  gap: 14px;
+}
+
+.betslip-panel {
+  border-color: color-mix(in oklab, var(--grass), transparent 55%);
+}
+
+.sportsbook-controls {
+  margin: 0 0 12px;
+}
+
+.coupon-board {
+  overflow: hidden;
+}
+
+.coupon-topline {
+  min-height: 66px;
+  padding: 0 16px;
+  background:
+    linear-gradient(135deg, var(--ink-strong), color-mix(in oklab, var(--grass-2), #000 35%));
+  color: #fff;
+}
+
+.coupon-topline h2 {
+  color: #fff;
+  font-size: 24px;
+}
+
+.coupon-topline .eyebrow {
+  color: rgba(235, 255, 224, 0.74);
+}
+
+.coupon-topline > span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #f5fff3;
+  font-weight: 950;
+}
+
+.date-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in oklab, var(--surface-soft), transparent 12%);
+}
+
+.date-tabs button {
+  flex: 0 0 auto;
+  min-width: 92px;
+  min-height: 48px;
+  padding: 7px 12px;
+  border-radius: 12px;
+  text-align: left;
+}
+
+.date-tabs span,
+.date-tabs small {
+  display: block;
+}
+
+.date-tabs span {
+  color: var(--ink-strong);
+  font-size: 13px;
+}
+
+.date-tabs small {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.coupon-market-header {
+  display: grid;
+  grid-template-columns: minmax(230px, 0.88fr) minmax(210px, 0.72fr) minmax(300px, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-height: 38px;
+  padding: 0 16px 0 20px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in oklab, var(--gold), transparent 64%);
+  color: color-mix(in oklab, var(--ink-strong), var(--gold) 18%);
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.coupon-market-header div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  text-align: center;
+}
+
+.coupon-date-section {
+  border-bottom: 1px solid var(--line);
+}
+
+.coupon-date-header {
+  min-height: 48px;
+  padding: 0 16px;
+  background: color-mix(in oklab, var(--surface-soft), transparent 8%);
+  border-bottom: 1px solid var(--line);
+}
+
+.coupon-date-header span,
+.coupon-date-header small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.coupon-date-header strong {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-strong);
+  font-size: 16px;
+}
+
 .dashboard-grid {
   display: grid;
   grid-template-columns: 300px minmax(680px, 1fr) 390px;
@@ -775,9 +1149,9 @@ select {
 .match-card {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(210px, 1fr) minmax(220px, 0.9fr) minmax(300px, 1fr);
+  grid-template-columns: minmax(230px, 0.88fr) minmax(210px, 0.72fr) minmax(300px, 1fr);
   gap: 12px;
-  padding: 15px 16px 15px 20px;
+  padding: 13px 16px 13px 20px;
   border-bottom: 1px solid var(--line);
   background: color-mix(in oklab, var(--surface-solid), transparent 2%);
   color: var(--ink);
@@ -795,7 +1169,9 @@ select {
 .match-card:hover,
 .match-card.selected,
 .match-card:focus-visible {
-  background: color-mix(in oklab, var(--lime), var(--surface-solid) 90%);
+  background:
+    linear-gradient(90deg, color-mix(in oklab, var(--lime), transparent 78%), transparent 55%),
+    color-mix(in oklab, var(--surface-solid), transparent 0%);
   outline: none;
 }
 
@@ -815,14 +1191,49 @@ body[data-theme="dark"] .match-card.selected {
 }
 
 .match-id {
+  color: var(--ink-strong);
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.coupon-meta-line {
+  justify-content: flex-start;
+  gap: 7px;
   color: var(--muted);
   font-size: 12px;
+  font-weight: 900;
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--muted), transparent 82%);
+  color: var(--muted);
+  font-size: 11px;
   font-weight: 950;
+}
+
+.status-chip.live {
+  background: color-mix(in oklab, var(--violet), transparent 72%);
+  color: var(--violet);
+}
+
+.status-chip.hot {
+  background: color-mix(in oklab, var(--red), transparent 80%);
+  color: var(--red);
+}
+
+.status-chip.soon {
+  background: color-mix(in oklab, var(--gold), transparent 76%);
+  color: color-mix(in oklab, var(--gold), var(--ink-strong) 70%);
 }
 
 .teams {
   display: grid;
-  gap: 7px;
+  gap: 5px;
 }
 
 .team-row {
@@ -830,7 +1241,7 @@ body[data-theme="dark"] .match-card.selected {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  min-height: 30px;
+  min-height: 27px;
 }
 
 .team-name {
@@ -859,7 +1270,7 @@ body[data-theme="dark"] .match-card.selected {
 
 .prob-row {
   display: grid;
-  grid-template-columns: 58px 1fr 46px;
+  grid-template-columns: minmax(48px, 72px) 1fr 44px;
   gap: 8px;
   align-items: center;
   color: var(--ink);
@@ -896,11 +1307,13 @@ body[data-theme="dark"] .match-card.selected {
 }
 
 .market-button {
-  min-height: 64px;
+  min-height: 58px;
   padding: 10px;
   border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--surface-solid);
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0)),
+    var(--surface-soft);
   color: var(--ink);
   text-align: center;
   transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
@@ -908,7 +1321,7 @@ body[data-theme="dark"] .match-card.selected {
 
 .market-button:hover {
   border-color: var(--grass);
-  box-shadow: 0 10px 22px rgba(17, 147, 95, 0.13);
+  box-shadow: 0 10px 22px rgba(17, 147, 95, 0.16);
 }
 
 .market-button strong,
@@ -918,7 +1331,7 @@ body[data-theme="dark"] .match-card.selected {
 
 .market-button strong {
   color: var(--ink-strong);
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .market-button span {
@@ -929,7 +1342,6 @@ body[data-theme="dark"] .match-card.selected {
 }
 
 .rule-chip {
-  justify-self: start;
   min-height: 30px;
   padding: 0 10px;
   border: 1px solid var(--line);
@@ -938,6 +1350,17 @@ body[data-theme="dark"] .match-card.selected {
   color: color-mix(in oklab, var(--gold), var(--ink-strong) 70%);
   font-size: 12px;
   font-weight: 950;
+}
+
+.match-tools {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.match-tools span {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .edge {
@@ -1576,18 +1999,32 @@ body[data-theme="dark"] .match-card.selected {
 }
 
 @media (max-width: 1320px) {
+  .sportsbook-shell,
   .dashboard-grid {
     grid-template-columns: 290px minmax(0, 1fr);
   }
 
+  .sportsbook-shell.sidebar-collapsed {
+    grid-template-columns: 74px minmax(0, 1fr);
+  }
+
+  .sportsbook-shell > .right-rail,
   .right-rail {
     grid-column: 1 / -1;
     grid-row: auto;
     grid-template-columns: 1fr 1fr;
   }
 
+  .sportsbook-shell > .right-rail .betslip-panel {
+    grid-column: 1 / -1;
+  }
+
   .match-card {
-    grid-template-columns: minmax(170px, 1fr) 270px 280px;
+    grid-template-columns: minmax(210px, 1fr) 250px 300px;
+  }
+
+  .coupon-market-header {
+    grid-template-columns: minmax(210px, 1fr) 250px 300px;
   }
 
   .data-layout,
@@ -1602,15 +2039,41 @@ body[data-theme="dark"] .match-card.selected {
   }
 
   .stadium-hero {
-    min-height: 420px;
+    min-height: 360px;
   }
 
   .topbar,
   .hero-content,
+  .sportsbook-shell,
   .dashboard-grid,
   .right-rail {
     display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .sportsbook-shell.sidebar-collapsed {
+    grid-template-columns: 1fr;
+  }
+
+  .catalog-panel,
+  .betslip-rail {
+    position: static;
+  }
+
+  .sportsbook-shell.sidebar-collapsed .catalog-panel > :not(.catalog-head),
+  .sportsbook-shell.sidebar-collapsed .catalog-head > div {
+    display: grid;
+  }
+
+  .sportsbook-shell.sidebar-collapsed .catalog-head > div {
+    display: block;
+  }
+
+  .sportsbook-shell.sidebar-collapsed .icon-button {
+    width: auto;
+    min-width: 48px;
+    height: auto;
+    border-radius: 999px;
   }
 
   .workspace-tabs {
@@ -1633,8 +2096,14 @@ body[data-theme="dark"] .match-card.selected {
   }
 
   .control-deck,
-  .match-card {
+  .match-card,
+  .coupon-market-header {
     grid-template-columns: 1fr;
+  }
+
+  .coupon-market-header {
+    align-items: start;
+    padding: 10px 16px;
   }
 
   .match-list,
@@ -1645,7 +2114,6 @@ body[data-theme="dark"] .match-card.selected {
 }
 
 @media (max-width: 620px) {
-  .hero-guide,
   .metric-strip,
   .insight-rail,
   .integration-grid,
@@ -1654,6 +2122,24 @@ body[data-theme="dark"] .match-card.selected {
   .bookmaker-grid,
   .markets {
     grid-template-columns: 1fr;
+  }
+
+  .hero-guide {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .hero-guide article {
+    min-height: 86px;
+    padding: 10px;
+  }
+
+  .hero-guide strong {
+    margin-top: 8px;
+    font-size: 13px;
+  }
+
+  .hero-guide small {
+    font-size: 11px;
   }
 
   .topbar-actions,

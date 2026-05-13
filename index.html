@@ -68,120 +68,137 @@
     </nav>
 
     <section class="app-view active" data-view-panel="sim">
-      <main class="dashboard-grid" id="simulator" tabindex="-1">
-        <section class="panel source-panel" aria-labelledby="sourceTitle">
-          <div class="panel-heading">
+      <main class="sportsbook-shell" id="simulator" tabindex="-1">
+        <aside class="panel catalog-panel" aria-labelledby="catalogTitle">
+          <div class="catalog-head">
             <div>
-              <p class="eyebrow">資料串接</p>
-              <h2 id="sourceTitle">來源狀態</h2>
+              <p class="eyebrow">主軸目錄</p>
+              <h2 id="catalogTitle">世界盃賽事</h2>
             </div>
-            <span class="mini-badge">Live-ready</span>
+            <button class="icon-button" id="sidebarToggle" type="button" aria-expanded="true" aria-label="收合左側目錄">收合</button>
           </div>
-          <div class="source-list" id="sourceList"></div>
-          <div class="connector-box">
-            <label for="proxyEndpoint">賠率 Proxy 端點</label>
-            <div class="endpoint-row">
-              <input id="proxyEndpoint" type="url" placeholder="https://your-domain/api/worldcup-odds">
-              <button id="connectEndpoint" type="button">連線</button>
-            </div>
-            <p>正式版由後端保存 API key；前端只接收標準化後的 JSON。</p>
-          </div>
-        </section>
 
-        <section class="panel overview-panel" aria-labelledby="overviewTitle">
-          <div class="panel-heading">
-            <div>
-              <p class="eyebrow">勝率引擎</p>
-              <h2 id="overviewTitle">推演摘要</h2>
-            </div>
-            <select id="sortSelect" aria-label="排序方式">
-              <option value="edge">模型差距</option>
-              <option value="time">賽程順序</option>
-              <option value="confidence">信心水位</option>
-            </select>
+          <div class="catalog-summary">
+            <span>可模擬場次</span>
+            <strong id="catalogMatchTotal">72</strong>
+            <small>賽程、賠率、規格卡、推演投注整合</small>
           </div>
-          <div class="metric-strip" id="metricStrip"></div>
-          <div class="control-deck">
-            <label>
-              <span>搜尋</span>
-              <input id="searchInput" type="search" placeholder="輸入球隊、組別、場次">
-            </label>
-            <label>
-              <span>組別</span>
-              <select id="groupFilter"></select>
-            </label>
-            <label>
-              <span>玩法</span>
-              <select id="marketFilter">
-                <option value="h2h">不讓分</option>
-                <option value="spread">讓分</option>
-                <option value="total">大小</option>
+
+          <div class="catalog-section">
+            <div class="section-title">
+              <span>組別目錄</span>
+              <small>點選後同步篩選中欄</small>
+            </div>
+            <div class="group-shortcut-list" id="groupShortcutList"></div>
+          </div>
+
+          <div class="catalog-section">
+            <div class="section-title">
+              <span>玩法切換</span>
+              <small>對應台灣運彩常見盤口</small>
+            </div>
+            <div class="market-shortcuts" role="group" aria-label="玩法切換">
+              <button class="active" data-market-shortcut="h2h" type="button">勝平負</button>
+              <button data-market-shortcut="spread" type="button">讓分</button>
+              <button data-market-shortcut="total" type="button">大小</button>
+            </div>
+          </div>
+
+          <div class="catalog-section">
+            <div class="section-title">
+              <span>日期目錄</span>
+              <small>每天賽事快速跳轉</small>
+            </div>
+            <div class="date-rail" id="dateRail"></div>
+          </div>
+
+          <div class="catalog-section connector-section" aria-labelledby="sourceTitle">
+            <div class="panel-heading compact-heading">
+              <div>
+                <p class="eyebrow">資料串接</p>
+                <h2 id="sourceTitle">來源狀態</h2>
+              </div>
+              <span class="mini-badge">Live-ready</span>
+            </div>
+            <div class="source-list compact-source-list" id="sourceList"></div>
+            <div class="connector-box compact-connector">
+              <label for="proxyEndpoint">賠率 Proxy 端點</label>
+              <div class="endpoint-row">
+                <input id="proxyEndpoint" type="url" placeholder="https://your-domain/api/worldcup-odds">
+                <button id="connectEndpoint" type="button">連線</button>
+              </div>
+              <p>正式版由後端保存 API key；前端只接收標準化後的 JSON。</p>
+            </div>
+          </div>
+        </aside>
+
+        <section class="coupon-main">
+          <section class="panel overview-panel" aria-labelledby="overviewTitle">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">勝率引擎</p>
+                <h2 id="overviewTitle">推演摘要</h2>
+              </div>
+              <select id="sortSelect" aria-label="排序方式">
+                <option value="edge">模型差距</option>
+                <option value="time">賽程順序</option>
+                <option value="confidence">信心水位</option>
               </select>
-            </label>
-          </div>
-          <div class="taicai-strip" aria-label="臺灣運彩玩法">
-            <article>
-              <span>臺彩模式</span>
-              <strong>足球全場 90 分鐘</strong>
-              <small>不含延長賽與 PK，模擬以固定賠率格式呈現。</small>
-            </article>
-            <article>
-              <span>核心玩法</span>
-              <strong>勝平負 · 讓分 · 大小</strong>
-              <small>與右側模擬投注單同步計算。</small>
-            </article>
-            <article>
-              <span>更新狀態</span>
-              <strong>賠率 / 比分 / 消息</strong>
-              <small>接上 proxy 後可依資料源即時刷新。</small>
-            </article>
-          </div>
-          <div class="insight-rail" id="insightRail"></div>
-        </section>
-
-        <section class="match-board" aria-label="賽事列表">
-          <div class="board-header">
-            <span>賽程與賠率</span>
-            <span id="matchCount">0 場</span>
-          </div>
-          <div class="match-list" id="matchList"></div>
-        </section>
-
-        <aside class="right-rail">
-          <section class="panel detail-panel" aria-labelledby="detailTitle">
-            <div class="panel-heading">
-              <div>
-                <p class="eyebrow">單場分析</p>
-                <h2 id="detailTitle">場次詳情</h2>
-              </div>
             </div>
-          <div id="matchDetail"></div>
-        </section>
-
-          <section class="panel sandbox-panel" aria-labelledby="sandboxTitle">
-            <div class="panel-heading">
-              <div>
-                <p class="eyebrow">沙盤推演</p>
-                <h2 id="sandboxTitle">即時模擬器</h2>
-              </div>
-            </div>
-            <div class="sandbox-controls">
+            <div class="control-deck sportsbook-controls">
               <label>
-                <span>主隊進球假設</span>
-                <input id="homeGoalInput" type="number" min="0" max="8" value="1">
+                <span>搜尋</span>
+                <input id="searchInput" type="search" placeholder="輸入球隊、組別、場次">
               </label>
               <label>
-                <span>客隊進球假設</span>
-                <input id="awayGoalInput" type="number" min="0" max="8" value="1">
+                <span>組別</span>
+                <select id="groupFilter"></select>
               </label>
               <label>
-                <span>市場波動</span>
-                <input id="marketShockInput" type="range" min="-20" max="20" value="0">
+                <span>玩法</span>
+                <select id="marketFilter">
+                  <option value="h2h">勝平負</option>
+                  <option value="spread">讓分</option>
+                  <option value="total">大小</option>
+                </select>
               </label>
             </div>
-            <div class="sandbox-result" id="sandboxResult"></div>
+            <div class="metric-strip" id="metricStrip"></div>
+            <div class="taicai-strip" aria-label="臺灣運彩玩法">
+              <article>
+                <span>臺彩模式</span>
+                <strong>足球全場 90 分鐘</strong>
+                <small>不含延長賽與 PK，模擬以固定賠率格式呈現。</small>
+              </article>
+              <article>
+                <span>核心玩法</span>
+                <strong>勝平負 · 讓分 · 大小</strong>
+                <small>與右側模擬投注單同步計算。</small>
+              </article>
+              <article>
+                <span>更新狀態</span>
+                <strong>賠率 / 比分 / 消息</strong>
+                <small>接上 proxy 後可依資料源即時刷新。</small>
+              </article>
+            </div>
+            <div class="insight-rail" id="insightRail"></div>
           </section>
 
+          <section class="match-board coupon-board" aria-label="每日賽事列表">
+            <div class="coupon-topline">
+              <div>
+                <p class="eyebrow">Daily coupons</p>
+                <h2>每日賽事</h2>
+              </div>
+              <span id="matchCount">0 場</span>
+            </div>
+            <div class="date-tabs" id="dateTabs" role="tablist" aria-label="日期分頁"></div>
+            <div class="coupon-market-header" id="marketColumnLabels"></div>
+            <div class="match-list" id="matchList"></div>
+          </section>
+        </section>
+
+        <aside class="right-rail betslip-rail">
           <section class="panel betslip-panel" aria-labelledby="betslipTitle">
             <div class="panel-heading">
               <div>
@@ -205,6 +222,40 @@
             </div>
             <button class="primary-button" id="submitSim" type="button">建立模擬單</button>
             <div id="ticketHistory" class="ticket-history"></div>
+          </section>
+
+          <section class="panel detail-panel" aria-labelledby="detailTitle">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">單場分析</p>
+                <h2 id="detailTitle">場次詳情</h2>
+              </div>
+            </div>
+            <div id="matchDetail"></div>
+          </section>
+
+          <section class="panel sandbox-panel" aria-labelledby="sandboxTitle">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">沙盤推演</p>
+                <h2 id="sandboxTitle">即時模擬器</h2>
+              </div>
+            </div>
+            <div class="sandbox-controls">
+              <label>
+                <span>主隊進球假設</span>
+                <input id="homeGoalInput" type="number" min="0" max="8" value="1">
+              </label>
+              <label>
+                <span>客隊進球假設</span>
+                <input id="awayGoalInput" type="number" min="0" max="8" value="1">
+              </label>
+              <label>
+                <span>市場波動</span>
+                <input id="marketShockInput" type="range" min="-20" max="20" value="0">
+              </label>
+            </div>
+            <div class="sandbox-result" id="sandboxResult"></div>
           </section>
         </aside>
       </main>
