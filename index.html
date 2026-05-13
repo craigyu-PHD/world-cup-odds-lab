@@ -40,22 +40,25 @@
           <h2>把世界盃賽事變成一座可操作的足球情報室。</h2>
           <p>先看資料源是否在線，再用組別、勝率和盤口差距找出值得複查的場次；想測的選項一鍵加入模擬單。</p>
         </div>
-        <div class="hero-guide" aria-label="快速操作">
-          <article>
-            <span>01</span>
-            <strong>選比賽</strong>
-            <small>搜尋球隊或切組別。</small>
-          </article>
-          <article>
-            <span>02</span>
-            <strong>看差距</strong>
-            <small>比對模型與盤口。</small>
-          </article>
-          <article>
-            <span>03</span>
-            <strong>放入模擬單</strong>
-            <small>測單場或串關。</small>
-          </article>
+        <div class="hero-side">
+          <div class="field-window" aria-hidden="true"></div>
+          <div class="hero-guide" aria-label="快速操作">
+            <article>
+              <span>01</span>
+              <strong>選比賽</strong>
+              <small>搜尋球隊或切組別。</small>
+            </article>
+            <article>
+              <span>02</span>
+              <strong>看差距</strong>
+              <small>比對模型與盤口。</small>
+            </article>
+            <article>
+              <span>03</span>
+              <strong>放入模擬單</strong>
+              <small>測單場或串關。</small>
+            </article>
+          </div>
         </div>
       </div>
     </header>
@@ -112,23 +115,12 @@
             <div class="date-rail" id="dateRail"></div>
           </div>
 
-          <div class="catalog-section connector-section" aria-labelledby="sourceTitle">
-            <div class="panel-heading compact-heading">
-              <div>
-                <p class="eyebrow">資料串接</p>
-                <h2 id="sourceTitle">來源狀態</h2>
-              </div>
-              <span class="mini-badge">Live-ready</span>
+          <div class="catalog-section">
+            <div class="section-title">
+              <span>開賽時間</span>
+              <small>完整時間快選</small>
             </div>
-            <div class="source-list compact-source-list" id="sourceList"></div>
-            <div class="connector-box compact-connector">
-              <label for="proxyEndpoint">賠率 Proxy 端點</label>
-              <div class="endpoint-row">
-                <input id="proxyEndpoint" type="url" placeholder="https://your-domain/api/worldcup-odds">
-                <button id="connectEndpoint" type="button">連線</button>
-              </div>
-              <p>正式版由後端保存 API key；前端只接收標準化後的 JSON。</p>
-            </div>
+            <select id="timeFilter" class="time-filter" aria-label="開賽時間"></select>
           </div>
         </aside>
 
@@ -209,8 +201,12 @@
             </div>
             <div class="stake-row">
               <label for="stakeInput">每注金額</label>
-              <input id="stakeInput" type="number" min="10" step="10" value="100">
+              <div class="stake-input-wrap">
+                <span>NTD</span>
+                <input id="stakeInput" type="number" min="10" step="10" value="100">
+              </div>
             </div>
+            <p class="stake-help">固定賠率下，下注金額不會改變賠率，只會改變預估返還。調整金額後下方會即時計算。</p>
             <div class="mode-toggle" role="group" aria-label="投注模式">
               <button class="active" data-slip-mode="single" type="button">單場</button>
               <button data-slip-mode="parlay" type="button">串關</button>
@@ -255,6 +251,7 @@
                 <input id="marketShockInput" type="range" min="-20" max="20" value="0">
               </label>
             </div>
+            <p class="sandbox-help">市場波動是沙盤假設：往右代表市場更追捧主隊，往左代表市場轉向客隊。它用來觀察情境改變後的勝率傾向，不代表真實盤口已變動。</p>
             <div class="sandbox-result" id="sandboxResult"></div>
           </section>
         </aside>
@@ -282,6 +279,24 @@
             </div>
           </div>
           <div class="integration-grid" id="integrationGrid"></div>
+          <div class="source-connector-panel" aria-labelledby="sourceTitle">
+            <div class="panel-heading compact-heading">
+              <div>
+                <p class="eyebrow">資料串接</p>
+                <h2 id="sourceTitle">來源狀態與 Proxy</h2>
+              </div>
+              <span class="mini-badge">Live-ready</span>
+            </div>
+            <div class="source-list" id="sourceList"></div>
+            <div class="connector-box">
+              <label for="proxyEndpoint">賠率 Proxy 端點</label>
+              <div class="endpoint-row">
+                <input id="proxyEndpoint" type="url" placeholder="https://your-domain/api/worldcup-odds">
+                <button id="connectEndpoint" type="button">連線</button>
+              </div>
+              <p>正式版由後端保存 API key；前端只接收標準化後的 JSON。</p>
+            </div>
+          </div>
         </section>
       </div>
     </section>
@@ -321,27 +336,55 @@
     </section>
 
     <section class="app-view" data-view-panel="guide" aria-label="使用指南">
-      <div class="guide-board">
-        <article class="guide-card">
-          <span>第一步</span>
-          <h2>先確認資料源</h2>
-          <p>左側會告訴你目前是示範資料、真實 API，還是等待 API key。正式使用時先連後端 proxy。</p>
-        </article>
-        <article class="guide-card">
-          <span>第二步</span>
-          <h2>用篩選縮小範圍</h2>
-          <p>選組別、玩法或直接搜尋球隊。排序選「模型差距」時，最值得複查的場次會排在前面。</p>
-        </article>
-        <article class="guide-card">
-          <span>第三步</span>
-          <h2>讀懂卡片</h2>
-          <p>綠色代表主隊，金色代表和局，藍色代表客隊。差距為正代表模型比盤口更看好。</p>
-        </article>
-        <article class="guide-card">
-          <span>第四步</span>
-          <h2>只做模擬</h2>
-          <p>點盤口加入投注單，切換單場或串關看預估返還。網站不會送出任何真實投注交易。</p>
-        </article>
+      <div class="guide-layout">
+        <section class="panel guide-primer">
+          <p class="eyebrow">How to read this platform</p>
+          <h2>使用指南與下注規則</h2>
+          <p>這個網站不是下注入口，而是把賽程、賠率、勝率模型與模擬投注單放在同一個操作台。先用左側目錄縮小日期與組別，再看中間賽事列，最後把想測的盤口放進右側模擬單。</p>
+        </section>
+
+        <section class="guide-board detailed-guide">
+          <article class="guide-card featured">
+            <span>賠率怎麼看</span>
+            <h2>1.29、4.48、9.66 是什麼意思？</h2>
+            <p>這是十進位固定賠率。下注 NTD 100，若選項成立，1.29 代表預估返還約 NTD 129，4.48 約 NTD 448，9.66 約 NTD 966。數字越低通常代表市場越看好，數字越高代表市場認為發生機率較低，但返還較高。</p>
+          </article>
+          <article class="guide-card">
+            <span>勝平負</span>
+            <h2>客場 · 和局 · 主場</h2>
+            <p>足球常見三選一玩法。客場是客隊勝，和局是 90 分鐘加傷停補時後平手，主場是主隊勝。本系統的賽事列會用客場、和局、主場三欄呈現。</p>
+          </article>
+          <article class="guide-card">
+            <span>讓分</span>
+            <h2>強隊先背分數</h2>
+            <p>讓分是把強弱差距轉成盤口。例：主隊 -1 表示主隊必須贏 2 球以上才算該選項成功；客隊 +1 表示客隊即使輸 1 球也可能仍符合該盤口條件。</p>
+          </article>
+          <article class="guide-card">
+            <span>大小</span>
+            <h2>看總進球數</h2>
+            <p>大小不是選勝負，而是選兩隊總進球是否高於或低於盤口。例：2.5 大代表總進球 3 球以上；2.5 小代表總進球 0 到 2 球。</p>
+          </article>
+          <article class="guide-card">
+            <span>單場</span>
+            <h2>每個選項分開試算</h2>
+            <p>單場模式會把投注單內每一個選項各自以同一注金試算，適合比較不同場次或不同玩法的返還。</p>
+          </article>
+          <article class="guide-card">
+            <span>過關</span>
+            <h2>多場一起成立才算</h2>
+            <p>過關也常稱串關。系統會把多個賠率相乘後試算返還，但所有選項都必須成立。返還變高，風險也同步變高。</p>
+          </article>
+          <article class="guide-card">
+            <span>市場波動</span>
+            <h2>用來做情境推演</h2>
+            <p>右側沙盤推演的市場波動不是即時盤口，而是假設市場情緒往主隊或客隊偏移，用來觀察模型勝率是否跟著改變。</p>
+          </article>
+          <article class="guide-card">
+            <span>下注規則</span>
+            <h2>只模擬 90 分鐘全場</h2>
+            <p>足球全場模擬以 90 分鐘加傷停補時為基準，不含延長賽與 PK。正式規則仍應以合法售票與官方公告為準。</p>
+          </article>
+        </section>
       </div>
     </section>
   </div>

@@ -233,6 +233,7 @@ let betslip = [];
 let tickets = [];
 let lastFocusedMatchCard = null;
 let selectedDateFilter = "all";
+let selectedTimeFilter = "all";
 
 const elements = {};
 
@@ -262,6 +263,7 @@ function collectElements() {
     "groupShortcutList",
     "dateRail",
     "dateTabs",
+    "timeFilter",
     "marketColumnLabels",
     "sidebarToggle",
     "matchDetail",
@@ -320,16 +322,27 @@ function bindEvents() {
     renderMetrics();
     renderInsights();
     renderDateControls();
+    renderTimeControls();
     renderMatchList();
   });
   elements.groupFilter.addEventListener("change", () => {
     selectedDateFilter = "all";
+    selectedTimeFilter = "all";
     updateGroupShortcutState();
     renderMetrics();
     renderInsights();
     renderDateControls();
+    renderTimeControls();
     renderMatchList();
   });
+  if (elements.timeFilter) {
+    elements.timeFilter.addEventListener("change", () => {
+      selectedTimeFilter = elements.timeFilter.value;
+      renderMetrics();
+      renderInsights();
+      renderMatchList();
+    });
+  }
   elements.marketFilter.addEventListener("change", () => {
     updateMarketShortcutState();
     renderMarketColumnLabels();
@@ -348,10 +361,12 @@ function bindEvents() {
       if (!button) return;
       elements.groupFilter.value = button.dataset.groupShortcut;
       selectedDateFilter = "all";
+      selectedTimeFilter = "all";
       updateGroupShortcutState();
       renderMetrics();
       renderInsights();
       renderDateControls();
+      renderTimeControls();
       renderMatchList();
     });
   }
@@ -553,6 +568,7 @@ function render() {
   renderMetrics();
   renderInsights();
   renderDateControls();
+  renderTimeControls();
   renderMarketColumnLabels();
   renderMatchList();
   renderDetail();
@@ -679,21 +695,54 @@ function bindDateFilterButtons() {
   document.querySelectorAll("[data-date-filter]").forEach((button) => {
     button.addEventListener("click", () => {
       selectedDateFilter = button.dataset.dateFilter;
+      selectedTimeFilter = "all";
       renderMetrics();
       renderInsights();
       renderDateControls();
+      renderTimeControls();
       renderMatchList();
     });
   });
 }
 
+function renderTimeControls() {
+  if (!elements.timeFilter) return;
+  const baseMatches = [...getFilteredMatches({ ignoreTime: true })].sort((a, b) => a.number - b.number);
+  const timeEntries = getTimeEntries(baseMatches);
+  if (selectedTimeFilter !== "all" && !timeEntries.some((entry) => entry.key === selectedTimeFilter)) {
+    selectedTimeFilter = "all";
+  }
+  elements.timeFilter.innerHTML = [
+    `<option value="all">全部時間（${baseMatches.length} 場）</option>`,
+    ...timeEntries.map((entry) => `<option value="${entry.key}">${entry.label}（${entry.count} 場）</option>`)
+  ].join("");
+  elements.timeFilter.value = selectedTimeFilter;
+}
+
+function getTimeEntries(matchList) {
+  const groups = new Map();
+  matchList.forEach((match) => {
+    const key = timeKey(match);
+    if (!groups.has(key)) {
+      groups.set(key, {
+        key,
+        label: `${dateLongLabel(match.date)} ${match.time}`,
+        count: 0,
+        order: match.number
+      });
+    }
+    groups.get(key).count += 1;
+  });
+  return [...groups.values()].sort((a, b) => a.order - b.order);
+}
+
 function renderMarketColumnLabels() {
   if (!elements.marketColumnLabels) return;
   const labels = {
-    h2h: ["主勝", "和局", "客勝"],
-    spread: ["主隊讓分", "客隊受讓", "和局"],
+    h2h: ["客場", "和局", "主場"],
+    spread: ["客場", "和局", "主場"],
     total: ["大分", "小分", "和局"]
-  }[elements.marketFilter.value] || ["主勝", "和局", "客勝"];
+  }[elements.marketFilter.value] || ["客場", "和局", "主場"];
   elements.marketColumnLabels.innerHTML = `
     <span>場次資訊</span>
     <span>模型勝率</span>
@@ -818,9 +867,9 @@ function marketButtons(match, market, edges) {
   if (market === "spread") {
     const line = averageSpread(match);
     return [
-      pickButton(match, "讓分", `${shortName(match.home)} ${formatPoint(line.point)}`, line.home, "spread_home", edges.home),
-      pickButton(match, "讓分", `${shortName(match.away)} ${formatPoint(-line.point)}`, line.away, "spread_away", edges.away),
-      pickButton(match, "不讓分", "和局", averageH2h(match).draw, "draw", edges.draw)
+      pickButton(match, "讓分", `客場 ${shortName(match.away)} ${formatPoint(-line.point)}`, line.away, "spread_away", edges.away),
+      pickButton(match, "不讓分", "和局", averageH2h(match).draw, "draw", edges.draw),
+      pickButton(match, "讓分", `主場 ${shortName(match.home)} ${formatPoint(line.point)}`, line.home, "spread_home", edges.home)
     ].join("");
   }
   if (market === "total") {
@@ -833,9 +882,9 @@ function marketButtons(match, market, edges) {
   }
   const line = averageH2h(match);
   return [
-    pickButton(match, "不讓分", shortName(match.home), line.home, "home", edges.home),
+    pickButton(match, "不讓分", `客場 ${shortName(match.away)}`, line.away, "away", edges.away),
     pickButton(match, "不讓分", "和局", line.draw, "draw", edges.draw),
-    pickButton(match, "不讓分", shortName(match.away), line.away, "away", edges.away)
+    pickButton(match, "不讓分", `主場 ${shortName(match.home)}`, line.home, "home", edges.home)
   ].join("");
 }
 
@@ -917,10 +966,15 @@ function renderSandbox() {
     away: shortName(match.away)
   };
   const selectedValue = betslip.length ? estimatePayout() : 0;
+  const shockText = shock === 0
+    ? "市場中性"
+    : shock > 0
+      ? `主隊熱度 +${shock}%`
+      : `客隊熱度 +${Math.abs(shock)}%`;
   elements.sandboxResult.innerHTML = `
     <div class="sandbox-scoreline">
       <strong>${shortName(match.home)} ${homeGoals} : ${awayGoals} ${shortName(match.away)}</strong>
-      <span>市場波動 ${shock > 0 ? "+" : ""}${shock}%</span>
+      <span>${shockText}</span>
     </div>
     <div class="sandbox-bars">
       ${sandboxBar(shortName(match.home), simulated.home, "home")}
@@ -1076,6 +1130,7 @@ async function connectEndpoint() {
       matches = payload.matches.map(normalizeExternalMatch);
       selectedMatchId = matches[0]?.id || selectedMatchId;
       selectedDateFilter = "all";
+      selectedTimeFilter = "all";
       buildGroupShortcuts();
       updateGroupShortcutState();
       elements.refreshLabel.textContent = "外部資料已載入";
@@ -1118,12 +1173,14 @@ function getFilteredMatches(options = {}) {
   const query = elements.searchInput?.value.trim().toLowerCase() || "";
   const group = elements.groupFilter?.value || "all";
   const date = options.ignoreDate ? "all" : selectedDateFilter;
+  const time = options.ignoreTime ? "all" : selectedTimeFilter;
   return matches.filter((match) => {
     const home = teamProfiles[match.home]?.name || match.home;
     const away = teamProfiles[match.away]?.name || match.away;
     const text = `${match.number} ${match.group} ${match.home} ${match.away} ${home} ${away}`.toLowerCase();
     return (group === "all" || match.group === group)
       && (date === "all" || match.date === date)
+      && (time === "all" || timeKey(match) === time)
       && (!query || text.includes(query));
   });
 }
@@ -1177,6 +1234,10 @@ function liveStatus(match) {
   if (match.number % 9 === 0) return { label: "焦點", type: "hot" };
   if (match.number % 5 === 0) return { label: "快開", type: "soon" };
   return { label: "賽前", type: "pre" };
+}
+
+function timeKey(match) {
+  return `${match.date}|${match.time}`;
 }
 
 function updateGroupShortcutState() {

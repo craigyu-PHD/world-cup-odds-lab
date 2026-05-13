@@ -16,10 +16,13 @@
   --sky: #168fd0;
   --red: #d44a3a;
   --violet: #6844c7;
+  --coral: #ff5b3f;
+  --mint: #5cf2bd;
   --shadow: 0 22px 70px rgba(21, 42, 29, 0.16);
   --shadow-soft: 0 14px 34px rgba(24, 43, 31, 0.12);
   --radius: 12px;
   --font: "Avenir Next", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --display-font: "PingFang TC", "Noto Sans TC", "Hiragino Sans", "Microsoft JhengHei", sans-serif;
 }
 
 body[data-theme="dark"] {
@@ -40,6 +43,8 @@ body[data-theme="dark"] {
   --sky: #56c6ff;
   --red: #ff786b;
   --violet: #a994ff;
+  --coral: #ff806a;
+  --mint: #7ff8ce;
   --shadow: 0 22px 80px rgba(0, 0, 0, 0.45);
   --shadow-soft: 0 14px 34px rgba(0, 0, 0, 0.34);
 }
@@ -55,6 +60,7 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
+  overflow-x: hidden;
   background:
     radial-gradient(circle at 15% 5%, rgba(185, 243, 60, 0.18), transparent 28%),
     radial-gradient(circle at 85% 10%, rgba(22, 143, 208, 0.18), transparent 26%),
@@ -111,7 +117,7 @@ p {
 
 .app-shell {
   position: relative;
-  width: min(1780px, 100%);
+  width: min(1880px, 100%);
   margin: 0 auto;
   padding: 18px;
 }
@@ -139,7 +145,7 @@ p {
 .hero-media::before {
   content: "";
   background:
-    linear-gradient(90deg, rgba(4, 15, 9, 0.92), rgba(4, 15, 9, 0.62) 42%, rgba(4, 15, 9, 0.78)),
+    linear-gradient(90deg, rgba(4, 15, 9, 0.94), rgba(4, 15, 9, 0.7) 43%, rgba(4, 15, 9, 0.2) 76%, rgba(4, 15, 9, 0.38)),
     linear-gradient(0deg, rgba(7, 16, 12, 0.2), rgba(7, 16, 12, 0.5));
   z-index: 3;
 }
@@ -169,8 +175,8 @@ p {
 
 .montage-b {
   background-image: url("media/soccer-night.jpg");
-  clip-path: polygon(64% 0, 100% 0, 100% 100%, 48% 100%);
-  opacity: 0.9;
+  clip-path: polygon(54% 0, 100% 0, 100% 100%, 42% 100%);
+  opacity: 1;
   transform: scale(1.08);
   animation: montageDrift 16s ease-in-out infinite alternate-reverse;
 }
@@ -236,7 +242,8 @@ h1 {
   font-size: clamp(24px, 2.2vw, 36px);
   line-height: 0.98;
   letter-spacing: 0;
-  font-weight: 950;
+  font-family: var(--display-font);
+  font-weight: 900;
 }
 
 h2 {
@@ -255,7 +262,7 @@ h2 {
 .panel-heading h2,
 .board-header span:first-child,
 .guide-card h2 {
-  font-family: "Arial Black", "Avenir Next", "Noto Sans TC", "PingFang TC", sans-serif;
+  font-family: var(--display-font);
   letter-spacing: 0;
 }
 
@@ -345,7 +352,7 @@ h3 {
 
 .hero-content {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(330px, 470px);
+  grid-template-columns: minmax(0, 0.82fr) minmax(420px, 0.58fr);
   gap: 18px;
   align-items: end;
   min-height: 218px;
@@ -357,10 +364,12 @@ h3 {
 }
 
 .hero-copy h2 {
-  max-width: 760px;
-  font-size: clamp(34px, 5vw, 72px);
-  line-height: 0.92;
+  max-width: 700px;
+  font-family: var(--display-font);
+  font-size: clamp(34px, 4.35vw, 66px);
+  line-height: 0.96;
   letter-spacing: 0;
+  font-weight: 900;
 }
 
 .hero-copy p:not(.eyebrow) {
@@ -369,6 +378,22 @@ h3 {
   color: rgba(243, 255, 239, 0.82);
   font-size: 16px;
   line-height: 1.65;
+}
+
+.hero-side {
+  display: grid;
+  gap: 10px;
+}
+
+.field-window {
+  min-height: 126px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(3, 13, 8, 0.08), rgba(3, 13, 8, 0.24)),
+    url("media/soccer-night.jpg") center / cover;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  opacity: 0.96;
 }
 
 .hero-guide {
@@ -454,13 +479,13 @@ body[data-theme="dark"] .workspace-tabs button.active {
 
 .sportsbook-shell {
   display: grid;
-  grid-template-columns: minmax(270px, 310px) minmax(720px, 1fr) minmax(360px, 420px);
+  grid-template-columns: 250px minmax(0, 1fr) 360px;
   gap: 14px;
   align-items: start;
 }
 
 .sportsbook-shell.sidebar-collapsed {
-  grid-template-columns: 74px minmax(760px, 1fr) minmax(360px, 420px);
+  grid-template-columns: 74px minmax(0, 1fr) 360px;
 }
 
 .catalog-panel,
@@ -534,8 +559,8 @@ body[data-theme="dark"] .workspace-tabs button.active {
   border: 1px solid var(--line);
   border-radius: 16px;
   background:
-    radial-gradient(circle at 88% 12%, color-mix(in oklab, var(--lime), transparent 67%), transparent 35%),
-    linear-gradient(135deg, color-mix(in oklab, var(--grass), transparent 82%), transparent 72%),
+    radial-gradient(circle at 88% 12%, color-mix(in oklab, var(--coral), transparent 70%), transparent 35%),
+    linear-gradient(135deg, color-mix(in oklab, var(--mint), transparent 74%), color-mix(in oklab, var(--gold), transparent 82%) 72%),
     var(--surface-soft);
 }
 
@@ -673,6 +698,16 @@ body[data-theme="dark"] .date-tabs button.active {
   font-size: 13px;
 }
 
+.time-filter {
+  width: 100%;
+  min-width: 0;
+}
+
+.time-filter option {
+  color: var(--ink);
+  background: var(--surface-solid);
+}
+
 .compact-heading {
   margin-bottom: 8px;
 }
@@ -698,6 +733,7 @@ body[data-theme="dark"] .date-tabs button.active {
   display: grid;
   gap: 14px;
   min-width: 0;
+  width: 100%;
 }
 
 .sportsbook-shell > .right-rail {
@@ -722,7 +758,8 @@ body[data-theme="dark"] .date-tabs button.active {
   min-height: 66px;
   padding: 0 16px;
   background:
-    linear-gradient(135deg, var(--ink-strong), color-mix(in oklab, var(--grass-2), #000 35%));
+    radial-gradient(circle at 88% 16%, color-mix(in oklab, var(--coral), transparent 42%), transparent 24%),
+    linear-gradient(135deg, color-mix(in oklab, var(--ink-strong), var(--grass-2) 14%), color-mix(in oklab, var(--grass-2), #000 22%));
   color: #fff;
 }
 
@@ -782,7 +819,7 @@ body[data-theme="dark"] .date-tabs button.active {
 
 .coupon-market-header {
   display: grid;
-  grid-template-columns: minmax(230px, 0.88fr) minmax(210px, 0.72fr) minmax(300px, 1fr);
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 0.62fr) minmax(320px, 1fr);
   align-items: center;
   gap: 12px;
   min-height: 38px;
@@ -1149,7 +1186,7 @@ select {
 .match-card {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(230px, 0.88fr) minmax(210px, 0.72fr) minmax(300px, 1fr);
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 0.62fr) minmax(320px, 1fr);
   gap: 12px;
   padding: 13px 16px 13px 20px;
   border-bottom: 1px solid var(--line);
@@ -1177,13 +1214,17 @@ select {
 
 body[data-theme="dark"] .match-card:hover,
 body[data-theme="dark"] .match-card.selected {
-  background: color-mix(in oklab, var(--lime), var(--surface-solid) 12%);
+  background:
+    linear-gradient(90deg, rgba(92, 242, 189, 0.14), rgba(255, 201, 90, 0.06) 58%, rgba(86, 198, 255, 0.08)),
+    #12251a;
 }
 
 .match-meta,
-.prob-bars {
+.prob-bars,
+.markets {
   display: grid;
   align-content: center;
+  min-width: 0;
 }
 
 .match-meta {
@@ -1242,6 +1283,7 @@ body[data-theme="dark"] .match-card.selected {
   justify-content: space-between;
   gap: 12px;
   min-height: 27px;
+  min-width: 0;
 }
 
 .team-name {
@@ -1254,7 +1296,7 @@ body[data-theme="dark"] .match-card.selected {
 
 .rating {
   display: inline-flex;
-  min-width: 72px;
+  min-width: 64px;
   justify-content: center;
   padding: 4px 8px;
   border: 1px solid var(--line);
@@ -1270,7 +1312,7 @@ body[data-theme="dark"] .match-card.selected {
 
 .prob-row {
   display: grid;
-  grid-template-columns: minmax(48px, 72px) 1fr 44px;
+  grid-template-columns: minmax(0, 72px) minmax(0, 1fr) 44px;
   gap: 8px;
   align-items: center;
   color: var(--ink);
@@ -1312,7 +1354,7 @@ body[data-theme="dark"] .match-card.selected {
   border: 1px solid var(--line);
   border-radius: 10px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.44), rgba(255, 255, 255, 0)),
     var(--surface-soft);
   color: var(--ink);
   text-align: center;
@@ -1321,7 +1363,30 @@ body[data-theme="dark"] .match-card.selected {
 
 .market-button:hover {
   border-color: var(--grass);
+  background:
+    linear-gradient(135deg, color-mix(in oklab, var(--lime), transparent 68%), color-mix(in oklab, var(--sky), transparent 88%)),
+    var(--surface-solid);
   box-shadow: 0 10px 22px rgba(17, 147, 95, 0.16);
+}
+
+body[data-theme="dark"] .coupon-market-header {
+  background: linear-gradient(135deg, rgba(255, 201, 90, 0.26), rgba(92, 242, 189, 0.12));
+  color: #fff6d9;
+}
+
+body[data-theme="dark"] .coupon-date-header,
+body[data-theme="dark"] .date-tabs {
+  background: #102017;
+}
+
+body[data-theme="dark"] .market-button {
+  background: #16261d;
+  border-color: rgba(215, 247, 218, 0.2);
+}
+
+body[data-theme="dark"] .market-button:hover {
+  background: #1f3f2c;
+  border-color: var(--lime);
 }
 
 .market-button strong,
@@ -1459,10 +1524,43 @@ body[data-theme="dark"] .match-card.selected {
   gap: 12px;
 }
 
+.stake-input-wrap {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  min-width: 150px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-solid);
+}
+
+.stake-input-wrap span {
+  display: grid;
+  place-items: center;
+  min-height: 40px;
+  padding: 0 9px;
+  background: color-mix(in oklab, var(--gold), transparent 74%);
+  color: color-mix(in oklab, var(--gold), var(--ink-strong) 72%);
+  font-size: 11px;
+  font-weight: 950;
+}
+
 .stake-row input {
-  width: 120px;
+  width: 100px;
+  min-height: 40px;
+  border: 0;
+  border-radius: 0;
   text-align: right;
   font-weight: 950;
+}
+
+.stake-help,
+.sandbox-help {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
 }
 
 .mode-toggle {
@@ -1773,6 +1871,16 @@ body[data-theme="dark"] .match-card.selected {
   text-decoration: none;
 }
 
+.source-connector-panel {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.source-stack-panel .source-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .video-stage {
   min-width: 0;
 }
@@ -1845,15 +1953,54 @@ body[data-theme="dark"] .match-card.selected {
   text-decoration: none;
 }
 
+.guide-layout {
+  display: grid;
+  gap: 14px;
+}
+
+.guide-primer {
+  min-height: 220px;
+  display: grid;
+  align-content: center;
+  background:
+    radial-gradient(circle at 82% 12%, color-mix(in oklab, var(--coral), transparent 62%), transparent 34%),
+    linear-gradient(135deg, color-mix(in oklab, var(--grass), transparent 82%), color-mix(in oklab, var(--sky), transparent 88%)),
+    var(--surface-solid);
+}
+
+.guide-primer h2 {
+  max-width: 760px;
+  font-family: var(--display-font);
+  font-size: clamp(30px, 4vw, 56px);
+}
+
+.guide-primer p:not(.eyebrow) {
+  max-width: 860px;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
 .guide-board {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
 }
 
+.detailed-guide {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .guide-card {
   min-height: 240px;
   padding: 18px;
+}
+
+.guide-card.featured {
+  grid-column: span 2;
+  background:
+    linear-gradient(135deg, color-mix(in oklab, var(--gold), transparent 74%), color-mix(in oklab, var(--mint), transparent 86%)),
+    var(--surface-solid);
 }
 
 .guide-card span {
@@ -2001,7 +2148,7 @@ body[data-theme="dark"] .match-card.selected {
 @media (max-width: 1320px) {
   .sportsbook-shell,
   .dashboard-grid {
-    grid-template-columns: 290px minmax(0, 1fr);
+    grid-template-columns: 250px minmax(0, 1fr);
   }
 
   .sportsbook-shell.sidebar-collapsed {
@@ -2020,11 +2167,17 @@ body[data-theme="dark"] .match-card.selected {
   }
 
   .match-card {
-    grid-template-columns: minmax(210px, 1fr) 250px 300px;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .coupon-market-header {
-    grid-template-columns: minmax(210px, 1fr) 250px 300px;
+    grid-template-columns: 1fr;
+    align-items: start;
+    padding: 10px 16px;
+  }
+
+  .coupon-market-header div {
+    text-align: left;
   }
 
   .data-layout,
@@ -2091,6 +2244,8 @@ body[data-theme="dark"] .match-card.selected {
   .metric-strip,
   .insight-rail,
   .integration-grid,
+  .source-stack-panel .source-list,
+  .detailed-guide,
   .guide-board {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -2111,12 +2266,18 @@ body[data-theme="dark"] .match-card.selected {
     max-height: none;
     overflow: visible;
   }
+
+  .field-window {
+    display: none;
+  }
 }
 
 @media (max-width: 620px) {
   .metric-strip,
   .insight-rail,
   .integration-grid,
+  .source-stack-panel .source-list,
+  .detailed-guide,
   .guide-board,
   .cadence-grid,
   .bookmaker-grid,
@@ -2126,6 +2287,10 @@ body[data-theme="dark"] .match-card.selected {
 
   .hero-guide {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .guide-card.featured {
+    grid-column: span 1;
   }
 
   .hero-guide article {
@@ -2150,6 +2315,11 @@ body[data-theme="dark"] .match-card.selected {
   .topbar-actions > *,
   .workspace-tabs button {
     flex: 1;
+  }
+
+  .workspace-tabs button {
+    min-width: 0;
+    padding: 0 8px;
   }
 
   .hero-copy h2 {
