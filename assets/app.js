@@ -745,7 +745,6 @@ function renderMarketColumnLabels() {
   }[elements.marketFilter.value] || ["客場", "和局", "主場"];
   elements.marketColumnLabels.innerHTML = `
     <span>場次資訊</span>
-    <span>模型勝率</span>
     <div>${labels.map((label) => `<strong>${label}</strong>`).join("")}</div>
   `;
 }
@@ -831,11 +830,11 @@ function matchCard(match, market) {
           <span>Group ${match.group} · ${lead.label} ${edgeLabel(lead.value)}</span>
           <button class="rule-chip" type="button" data-rule-match="${match.id}">規格卡</button>
         </div>
-      </div>
-      <div class="prob-bars">
-        ${probRow(shortName(match.home), probs.home, "home")}
-        ${probRow("和局", probs.draw, "draw")}
-        ${probRow(shortName(match.away), probs.away, "away")}
+        <div class="prob-pills">
+          <span>客 ${pct(probs.away)}</span>
+          <span>和 ${pct(probs.draw)}</span>
+          <span>主 ${pct(probs.home)}</span>
+        </div>
       </div>
       <div class="markets">
         ${marketButtons(match, market, edges)}

@@ -18,6 +18,8 @@
   --violet: #6844c7;
   --coral: #ff5b3f;
   --mint: #5cf2bd;
+  --lottery-red: #b72a20;
+  --lottery-red-dark: #8f1f18;
   --shadow: 0 22px 70px rgba(21, 42, 29, 0.16);
   --shadow-soft: 0 14px 34px rgba(24, 43, 31, 0.12);
   --radius: 12px;
@@ -45,6 +47,8 @@ body[data-theme="dark"] {
   --violet: #a994ff;
   --coral: #ff806a;
   --mint: #7ff8ce;
+  --lottery-red: #ff6f5f;
+  --lottery-red-dark: #bd392f;
   --shadow: 0 22px 80px rgba(0, 0, 0, 0.45);
   --shadow-soft: 0 14px 34px rgba(0, 0, 0, 0.34);
 }
@@ -55,6 +59,7 @@ body[data-theme="dark"] {
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -751,6 +756,7 @@ body[data-theme="dark"] .date-tabs button.active {
 }
 
 .coupon-board {
+  max-width: 100%;
   overflow: hidden;
 }
 
@@ -758,8 +764,8 @@ body[data-theme="dark"] .date-tabs button.active {
   min-height: 66px;
   padding: 0 16px;
   background:
-    radial-gradient(circle at 88% 16%, color-mix(in oklab, var(--coral), transparent 42%), transparent 24%),
-    linear-gradient(135deg, color-mix(in oklab, var(--ink-strong), var(--grass-2) 14%), color-mix(in oklab, var(--grass-2), #000 22%));
+    radial-gradient(circle at 88% 16%, color-mix(in oklab, var(--gold), transparent 45%), transparent 24%),
+    linear-gradient(135deg, var(--lottery-red), var(--lottery-red-dark));
   color: #fff;
 }
 
@@ -819,14 +825,14 @@ body[data-theme="dark"] .date-tabs button.active {
 
 .coupon-market-header {
   display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(0, 0.62fr) minmax(320px, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(282px, 0.82fr);
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   min-height: 38px;
   padding: 0 16px 0 20px;
   border-bottom: 1px solid var(--line);
-  background: color-mix(in oklab, var(--gold), transparent 64%);
-  color: color-mix(in oklab, var(--ink-strong), var(--gold) 18%);
+  background: #ffe99b;
+  color: #4a3820;
   font-size: 12px;
   font-weight: 950;
 }
@@ -835,6 +841,9 @@ body[data-theme="dark"] .date-tabs button.active {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
+}
+
+.coupon-market-header strong {
   text-align: center;
 }
 
@@ -1181,17 +1190,21 @@ select {
   max-height: none;
   min-height: 0;
   overflow: visible;
+  max-width: 100%;
 }
 
 .match-card {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(0, 0.62fr) minmax(320px, 1fr);
-  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) minmax(282px, 0.82fr);
+  gap: 10px;
+  align-items: stretch;
   padding: 13px 16px 13px 20px;
   border-bottom: 1px solid var(--line);
   background: color-mix(in oklab, var(--surface-solid), transparent 2%);
   color: var(--ink);
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .match-card::before {
@@ -1220,8 +1233,7 @@ body[data-theme="dark"] .match-card.selected {
 }
 
 .match-meta,
-.prob-bars,
-.markets {
+.prob-bars {
   display: grid;
   align-content: center;
   min-width: 0;
@@ -1232,7 +1244,13 @@ body[data-theme="dark"] .match-card.selected {
 }
 
 .match-id {
-  color: var(--ink-strong);
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 7px;
+  border-radius: 6px;
+  background: var(--lottery-red);
+  color: #fff;
   font-size: 13px;
   font-weight: 950;
 }
@@ -1346,18 +1364,26 @@ body[data-theme="dark"] .match-card.selected {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   align-content: center;
+  min-width: 0;
 }
 
 .market-button {
-  min-height: 58px;
-  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 64px;
+  padding: 8px 6px;
   border: 1px solid var(--line);
   border-radius: 10px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.44), rgba(255, 255, 255, 0)),
-    var(--surface-soft);
-  color: var(--ink);
-  text-align: center;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0)),
+    #f1f1ef;
+  color: #07110c;
+  text-align: left;
   transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 
@@ -1382,6 +1408,7 @@ body[data-theme="dark"] .date-tabs {
 body[data-theme="dark"] .market-button {
   background: #16261d;
   border-color: rgba(215, 247, 218, 0.2);
+  color: #f5fff5;
 }
 
 body[data-theme="dark"] .market-button:hover {
@@ -1395,14 +1422,42 @@ body[data-theme="dark"] .market-button:hover {
 }
 
 .market-button strong {
-  color: var(--ink-strong);
-  font-size: 14px;
+  color: #07110c;
+  font-size: 13px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 
 .market-button span {
   margin-top: 4px;
-  color: var(--muted);
+  color: #304238;
   font-size: 12px;
+  font-weight: 950;
+}
+
+body[data-theme="dark"] .market-button strong {
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .market-button span {
+  color: #cfe4d5;
+}
+
+.prob-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.prob-pills span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--muted), transparent 86%);
+  color: var(--muted);
+  font-size: 11px;
   font-weight: 950;
 }
 
@@ -2167,22 +2222,31 @@ body[data-theme="dark"] .market-button:hover {
   }
 
   .match-card {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: 1fr;
   }
 
   .coupon-market-header {
     grid-template-columns: 1fr;
-    align-items: start;
-    padding: 10px 16px;
   }
 
   .coupon-market-header div {
-    text-align: left;
+    display: none;
+  }
+
+  .markets {
+    grid-template-columns: 1fr;
   }
 
   .data-layout,
   .watch-layout {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 1321px) {
+  .market-button {
+    align-items: center;
+    text-align: center;
   }
 }
 
@@ -2250,15 +2314,14 @@ body[data-theme="dark"] .market-button:hover {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .control-deck,
-  .match-card,
-  .coupon-market-header {
+  .control-deck {
     grid-template-columns: 1fr;
   }
 
+  .match-card,
   .coupon-market-header {
-    align-items: start;
-    padding: 10px 16px;
+    grid-template-columns: 1fr;
+    gap: 6px;
   }
 
   .match-list,
@@ -2283,6 +2346,31 @@ body[data-theme="dark"] .market-button:hover {
   .bookmaker-grid,
   .markets {
     grid-template-columns: 1fr;
+  }
+
+  .match-card,
+  .coupon-market-header {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding-left: 12px;
+    padding-right: 8px;
+  }
+
+  .coupon-market-header {
+    font-size: 11px;
+  }
+
+  .market-button {
+    min-height: 54px;
+    padding: 6px 4px;
+  }
+
+  .market-button strong {
+    font-size: 11px;
+  }
+
+  .market-button span {
+    font-size: 10px;
   }
 
   .hero-guide {
